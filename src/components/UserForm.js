@@ -1,74 +1,83 @@
-import React, { useState, useEffect } from "react";
+// UserForm.js
+import React, { useContext, useState, useEffect } from "react";
+import { UserContext } from "../contexts/UserContext";
 
-const UserForm = ({ currentUser, onSave, onCancel }) => {
-  const [name, setName] = useState(currentUser ? currentUser.name : "");
-  const [email, setEmail] = useState(currentUser ? currentUser.email : "");
-  const [age, setAge] = useState(currentUser ? currentUser.age : "");
-  const [status, setStatus] = useState(
-    currentUser ? currentUser.status : "aktif"
-  );
+const UserForm = () => {
+  const { currentUser, handleSave, setCurrentUser } = useContext(UserContext);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [age, setAge] = useState("");
+  const [status, setStatus] = useState("aktif");
 
   useEffect(() => {
+    // Mengisi nilai form jika currentUser ada (untuk edit)
     if (currentUser) {
-      setName(currentUser.name);
-      setEmail(currentUser.email);
-      setAge(currentUser.age);
-      setStatus(currentUser.status);
+      setName(currentUser.name || "");
+      setEmail(currentUser.email || "");
+      setAge(currentUser.age || "");
+      setStatus(currentUser.status || "aktif");
     }
   }, [currentUser]);
 
   const handleSubmit = (e) => {
+    // Menyimpan data pengguna saat form disubmit
     e.preventDefault();
-    if (!name || !email || !/^\S+@\S+\.\S+$/.test(email) || age <= 0) {
-      alert("Data tidak valid!");
-      return;
-    }
-    onSave({ id: currentUser?.id, name, email, age, status });
+    handleSave({ id: currentUser?.id, name, email, age, status });
   };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">
-          {currentUser ? "Edit" : "Tambah"} Pengguna
+        <h2 className="text-xl font-semibold mb-4">
+          {currentUser?.id ? "Edit Pengguna" : "Tambah Pengguna"}
         </h2>
         <form onSubmit={handleSubmit}>
-          <input
-            className="block w-full border rounded mb-3 p-2"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nama"
-            required
-          />
-          <input
-            type="email"
-            className="block w-full border rounded mb-3 p-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-          />
-          <input
-            type="number"
-            className="block w-full border rounded mb-3 p-2"
-            value={age}
-            onChange={(e) => setAge(Number(e.target.value))}
-            placeholder="Umur"
-            required
-          />
-          <select
-            className="block w-full border rounded mb-3 p-2"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="aktif">Aktif</option>
-            <option value="tidak aktif">Tidak Aktif</option>
-          </select>
-          <div className="flex justify-end space-x-2">
+          <div className="mb-4">
+            <label className="block font-semibold">Nama:</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border px-2 py-1 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold">Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border px-2 py-1 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold">Umur:</label>
+            <input
+              type="number"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="w-full border px-2 py-1 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block font-semibold">Status Keanggotaan:</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full border px-2 py-1 rounded"
+            >
+              <option value="aktif">Aktif</option>
+              <option value="tidak aktif">Tidak Aktif</option>
+            </select>
+          </div>
+          <div className="flex justify-between">
             <button
               type="button"
-              onClick={onCancel}
-              className="bg-gray-400 text-white px-4 py-2 rounded"
+              onClick={() => setCurrentUser(null)}
+              className="bg-gray-500 text-white px-4 py-2 rounded"
             >
               Batal
             </button>
