@@ -10,6 +10,7 @@ const UserTable = () => {
     handleSort,
     setCurrentUser,
     handleDelete,
+    isLoading,
   } = useContext(UserContext);
   const [filteredUsers, setFilteredUsers] = useState([]);
 
@@ -21,6 +22,10 @@ const UserTable = () => {
         : users
     );
   }, [users, filterStatus]);
+
+  if (isLoading) {
+    return <p className="text-center">Loading...</p>; // Tampilkan loading
+  }
 
   return (
     <div>

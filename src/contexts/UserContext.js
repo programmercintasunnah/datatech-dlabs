@@ -9,6 +9,7 @@ export const UserProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [filterStatus, setFilterStatus] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: "ascending",
@@ -19,10 +20,12 @@ export const UserProvider = ({ children }) => {
     const localData = JSON.parse(localStorage.getItem("users")) || [];
     if (localData.length) {
       setUsers(localData);
+      setIsLoading(false);
     } else {
       fetchUsers().then((data) => {
         setUsers(data);
         localStorage.setItem("users", JSON.stringify(data));
+        setIsLoading(false);
       });
     }
   }, []);
@@ -84,6 +87,7 @@ export const UserProvider = ({ children }) => {
         handleSave,
         handleDelete,
         handleSort,
+        isLoading,
       }}
     >
       {children}

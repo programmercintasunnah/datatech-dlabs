@@ -8,6 +8,7 @@ const UserForm = () => {
   const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
   const [status, setStatus] = useState("aktif");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     // Mengisi nilai form jika currentUser ada (untuk edit)
@@ -19,9 +20,42 @@ const UserForm = () => {
     }
   }, [currentUser]);
 
+  const validateFields = (fields) => {
+    const errors = {};
+
+    // Iterasi setiap field yang ingin divalidasi
+    for (const [field, value] of Object.entries(fields)) {
+      if (field === "name" && value.trim() === "") {
+        errors.name = "Nama tidak boleh kosong.";
+      }
+      if (field === "email" && !/\S+@\S+\.\S+/.test(value)) {
+        errors.email = "Email tidak valid.";
+      }
+      if (field === "age" && (isNaN(value) || value <= 0)) {
+        errors.age = "Umur harus berupa angka positif.";
+      }
+    }
+
+    // Mengupdate state errors
+    setErrors(errors);
+
+    // Mengembalikan objek errors untuk pengecekan di handleSubmit
+    return errors;
+  };
+
   const handleSubmit = (e) => {
-    // Menyimpan data pengguna saat form disubmit
     e.preventDefault();
+
+    // Validasi semua field yang diperlukan saat submit
+    const fieldsToValidate = { name, email, age };
+    const errors = validateFields(fieldsToValidate);
+
+    // Jika terdapat error, batalkan proses simpan
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
+    // Jika tidak ada error, lanjutkan dengan menyimpan data
     handleSave({ id: currentUser?.id, name, email, age, status });
   };
 
@@ -37,30 +71,43 @@ const UserForm = () => {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                validateFields({ name: e.target.value });
+              }}
               className="w-full border px-2 py-1 rounded"
-              required
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name}</p>
+            )}
           </div>
           <div className="mb-4">
             <label className="block font-semibold">Email:</label>
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                validateFields({ email: e.target.value });
+              }}
               className="w-full border px-2 py-1 rounded"
-              required
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email}</p>
+            )}
           </div>
           <div className="mb-4">
             <label className="block font-semibold">Umur:</label>
             <input
               type="number"
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e) => {
+                setAge(e.target.value);
+                validateFields({ age: e.target.value });
+              }}
               className="w-full border px-2 py-1 rounded"
-              required
             />
+            {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
           </div>
           <div className="mb-4">
             <label className="block font-semibold">Status Keanggotaan:</label>
